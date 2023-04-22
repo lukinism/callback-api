@@ -1,26 +1,28 @@
 <?php
+require_once(CLASSES_PATH . "Ub/VkApi.php");
+require_once(CLASSES_PATH . "Ub/BindManager.php");
 class UbCallbackAddUser implements UbCallbackAction {
-	function execute($userId, $object, $userbot) {
+    private UbBindManager $bindManager;
+    private UbVkApi $vkApi;
+	function execute($userId, $object, $userData) {
 
+        $this->bindManager = new UbBindManager();
+        $this->vkApi = new UbVkApi($userData['token']);
 
 		$code = $object['chat'];
-		require_once(CLASSES_PATH . "Ub/BindManager.php");
-		$bManager = new UbBindManager();
-		$chat = $bManager->getByUserChat($userId, $code);
+		$chat = $this->bindManager->getByUserChat($userId, $code);
 
 		if (!$chat) {
 			UbUtil::echoJson(UbUtil::buildErrorResponse('error', 'no chat bind', UB_ERROR_NO_CHAT));
 			return;
 		}
 
-		require_once(CLASSES_PATH . "Ub/VkApi.php");
-		$vk = new UbVkApi($userbot['token']);
-		$res = $vk->messagesAddChatUser($object['user_id'], $chat['id_chat']);
-		if (isset($res['error'])) {
+		$res = $this->vkApi->messagesAddChatUser($object['user_id'], $chat['id_chat']);
+
+        if (isset($res['error'])) {
 			$peerId = UbVkApi::chat2PeerId($chat['id_chat']);
 			$error = UbUtil::getVkErrorText($res['error']);
-			$vk->messagesSend($peerId, UB_ICON_WARN . ' ' . $error);
-			//UbUtil::echoJson(UbUtil::errorVkResponse($res['error']));
+			$this->vkApi->messagesSend($peerId, UB_ICON_WARN . ' ' . $error);
 		}
 
 		echo 'ok';

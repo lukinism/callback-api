@@ -2,48 +2,20 @@
 
 
 class UbDbUtil {
-	/** @return mysqli */
-	static function singleton() {
-		static $db;
-		if (!$db) {
-			$db = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
-		}
-		return $db;
-	}
+	/** @return PDO */
 
-	static function select($query) {
-		$db = self::singleton();
-		$items = $db->query($query);
-		return $items->fetch_all(MYSQLI_ASSOC);
-	}
+    static function getPDO(): PDO
+    {
+        $db = new PDO('mysql:host='.DB_HOST.';dbname='.DB_DATABASE, DB_USER, DB_PASSWORD);
+        $db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $db;
+    }
 
-	static function selectOne($query) {
-		$items = self::select($query);
-		if (count($items) > 0)
-			return $items[0];
-		return null;
-	}
-
-	static function query($query) {
-		$db = self::singleton();
-		$db->query($query);
-		return $db->affected_rows;
-	}
-
-	static function stringVal($val) {
-		return '"' . self::stringValStripped($val) . '"';
-	}
-
-	static function stringValStrippedLike($val) {
-		return str_replace(array('%', '_'), array('\%', '\_'), self::stringValStripped($val));
-	}
-
-	static function stringValStripped($val) {
-		$db = self::singleton();
-		return $db->escape_string($val);
-	}
-
-	static function intVal($val) {
-		return intval($val);
-	}
+    static function query($sql, $params = array()): false|PDOStatement
+    {
+        $db = self::getPDO();
+        $stmt = $db->prepare($sql);
+        $stmt->execute($params);
+        return $stmt;
+    }
 }
