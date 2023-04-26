@@ -1,17 +1,17 @@
 <?php
-class UbCallbackPrintBookmark implements UbCallbackAction {
-	function execute($userId, $object, $userbot) {
-
-		require_once(CLASSES_PATH . "Ub/BindManager.php");
-		$bManager = new UbBindManager();
-		$chat = $bManager->getByUserChat($userId, $object['chat']);
+require_once(CLASSES_PATH . "Ub/BindManager.php");
+#[AllowDynamicProperties] class UbCallbackPrintBookmark implements UbCallbackAction {
+	function execute($userId, $object, $userData): void
+    {
+        $this->bindManager = new UbBindManager();
+		$chat = $this->bindManager->getByUserChat($userId, $object['chat']);
 		if (!$chat) {
 			UbUtil::echoError('no chat bind', UB_ERROR_NO_CHAT);
 			return;
 		}
 
 		$peerId = UbVkApi::chat2PeerId($chat['id_chat']);
-		$vk = new UbVkApi($userbot['token']);
+		$vk = new UbVkApi($userData['token']);
 		$message = $vk->messagesGetByConversationMessageId($peerId, [$object['conversation_message_id']]);
 		if (isset($message['error'])) {
 			$e = $message['error'];
@@ -27,10 +27,10 @@ class UbCallbackPrintBookmark implements UbCallbackAction {
 				$e = $message['error'];
 
 				$msg = UB_ICON_WARN . " Закладка недоступна. Удаляю.";
-				switch ($e['error_code']) {
-					case 100 : $msg .= "\n Скорее всего сменился юзербот (100)"; break;
-					default : $msg .= "\nОшибка ВК: " . $e['error_msg'] . ' (' . $e['error_code'] . ')';
-				}
+                $msg .= match ($e['error_code']) {
+                    100 => "\n Скорее всего сменился юзербот (100)",
+                    default => "\nОшибка ВК: " . $e['error_msg'] . ' (' . $e['error_code'] . ')',
+                };
 				$res = $vk->messagesSend($peerId, $msg);
 			}
 		}

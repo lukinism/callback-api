@@ -1,10 +1,13 @@
 <?php
+require_once(CLASSES_PATH . "Ub/MethodResolver.php");
+require_once(CLASSES_PATH . "Ub/DataManager.php");
 require_once(CLASSES_PATH . "Ub/Callback/Action.php");
 require_once(CLASSES_PATH . "Ub/Util.php");
 require_once(CLASSES_PATH . "Ub/VkApi.php");
 require_once(CLASSES_PATH . "Ub/DbUtil.php");
 class UbCallbackCallback {
-	function run() {
+	function run(): void
+    {
 		$encode = file_get_contents('php://input');
 
 		if (!$encode) {
@@ -13,13 +16,7 @@ class UbCallbackCallback {
 		}
 		$data = json_decode($encode, true);
 
-		/*if ($data['secret'] != SECRET_KEY) {
-			UbUtil::echoError('secret is wrong', 2);
-			return;
-		}*/
-
-		require_once(CLASSES_PATH . "Ub/MethodResolver.php");
-		$resolver = new UbMethodResolver();
+        $resolver = new UbMethodResolver();
 		$method = $resolver->getMethodHandler($data['method']);
 
 		if (!$method) {
@@ -27,7 +24,6 @@ class UbCallbackCallback {
 			return;
 		}
 
-		require_once(CLASSES_PATH . "Ub/DataManager.php");
 		$ubManager = new UbDataManager();
 		$userbot = $ubManager->getByIdSecret($data['user_id'], $data['secret']);
 		if (!$userbot) {

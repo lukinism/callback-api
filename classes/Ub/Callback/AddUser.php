@@ -1,10 +1,9 @@
 <?php
 require_once(CLASSES_PATH . "Ub/VkApi.php");
 require_once(CLASSES_PATH . "Ub/BindManager.php");
-class UbCallbackAddUser implements UbCallbackAction {
-    private UbBindManager $bindManager;
-    private UbVkApi $vkApi;
-	function execute($userId, $object, $userData) {
+#[AllowDynamicProperties] class UbCallbackAddUser implements UbCallbackAction {
+	function execute($userId, $object, $userData): void
+    {
 
         $this->bindManager = new UbBindManager();
         $this->vkApi = new UbVkApi($userData['token']);
