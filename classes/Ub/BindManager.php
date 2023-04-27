@@ -2,19 +2,21 @@
 
 class UbBindManager {
 
-	public function getByUserChat($userId, $code) {
-		return UbDbUtil::selectOne($this->getSelect('id_user = ' . UbDbUtil::intVal($userId) . ' AND code = ' . UbDbUtil::stringVal($code)));
-	}
+    public function getByUserChat($userId, $code) {
+        $db = UbDbUtil::getPDO();
+        $stmt = $db->prepare('SELECT * FROM userbot_bind WHERE id_user = :userId AND code = :code');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':code', $code, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
+    }
 
-	public function saveOrUpdate($t) {
-		$sql = 'INSERT INTO userbot_bind SET id_user = ' . UbDbUtil::intVal($t['id_user']) . ', code = ' . UbDbUtil::stringVal($t['code']) . ', id_chat = ' . UbDbUtil::intVal($t['id_chat'])
-				. ' ON DUPLICATE KEY UPDATE'
-				. ' id_chat = VALUES(id_chat)'
-		;
-		return UbDbUtil::query($sql);
-	}
-
-	private function getSelect($cond) {
-		return 'SELECT * FROM userbot_bind WHERE ' . $cond;
-	}
+    public function saveOrUpdate($t) {
+        $db = UbDbUtil::getPDO();
+        $stmt = $db->prepare('INSERT INTO userbot_bind SET id_user = :id_user, code = :code, id_chat = :id_chat ON DUPLICATE KEY UPDATE id_chat = VALUES(id_chat)');
+        $stmt->bindParam(':id_user', $t['id_user'], PDO::PARAM_INT);
+        $stmt->bindParam(':code', $t['code'], PDO::PARAM_STR);
+        $stmt->bindParam(':id_chat', $t['id_chat'], PDO::PARAM_INT);
+        return $stmt->execute();
+    }
 }

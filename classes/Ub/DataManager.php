@@ -3,14 +3,20 @@
 class UbDataManager {
 
 	function get($userId) {
-		return UbDbUtil::selectOne($this->getSelect('id_user = ' . UbDbUtil::intVal($userId)));
-	}
-
-	private function getSelect($cond) {
-		return 'SELECT * FROM userbot_data WHERE ' . $cond;
+        $db = UbDbUtil::getPDO();
+		$stmt = $db->prepare('SELECT * FROM userbot_data WHERE id_user = :userId');
+        $stmt->bindParam(':userId', $userId, PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
 	}
 
 	public function getByIdSecret($userId, $secret) {
-		return UbDbUtil::selectOne($this->getSelect('id_user = ' . UbDbUtil::intVal($userId) . ' AND secret = ' . UbDbUtil::stringVal($secret)));
+        $db = UbDbUtil::getPDO();
+		$stmt = $db->prepare('SELECT * FROM userbot_data WHERE id_user = :id_user AND secret = :secret');
+        $stmt->bindParam(':id_user', $userId, PDO::PARAM_INT);
+        $stmt->bindParam(':secret', $secret, PDO::PARAM_STR);
+        $stmt->execute();
+        return $stmt->fetch(PDO::FETCH_ASSOC);
 	}
 }
+
