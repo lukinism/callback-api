@@ -1,5 +1,5 @@
 <?php
-define('DB_HOST', 'localhost');
-define('DB_USER', 'admin');
-define('DB_PASSWORD', 'password');
-define('DB_DATABASE', 'ub_database');
+const DB_HOST = 'localhost';
+const DB_USER = 'admin';
+const DB_PASSWORD = 'password';
+const DB_DATABASE = 'ub_database';

@@ -10,17 +10,17 @@ SET time_zone = "+00:00";
 
 
 CREATE TABLE `userbot_bind` (
-  `id_user` int(11) NOT NULL,
-  `code` varchar(8) NOT NULL,
-  `id_chat` int(11) NOT NULL,
-  PRIMARY KEY (`code`) USING BTREE
+                              `id_user` int(11) NOT NULL,
+                              `code` varchar(8) NOT NULL,
+                              `id_chat` int(11) NOT NULL,
+                              PRIMARY KEY (`code`) USING BTREE
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE `userbot_data` (
-  `id_user` int(11) NOT NULL,
-  `token` text NOT NULL,
-  `secret` varchar(32) NOT NULL,
-  PRIMARY KEY (`id_user`)
+                              `id_user` int(11) NOT NULL,
+                              `token` text NOT NULL,
+                              `secret` varchar(32) NOT NULL,
+                              PRIMARY KEY (`id_user`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 COMMIT;
 

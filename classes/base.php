@@ -10,7 +10,7 @@ if (!defined('CLASSES_PATH'))
 require_once(CLASSES_PATH . "constants.php");
 require_once(CLASSES_PATH . "db.php");
 
-define("SITE_ENCODING", "utf-8");
+const SITE_ENCODING = "utf-8";
 
 date_default_timezone_set("Europe/Moscow");
 
