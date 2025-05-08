@@ -25,7 +25,7 @@ require_once(CLASSES_PATH . "Ub/BindManager.php");
 
         if (isset($messages['error'])) {
 			$error = UbUtil::getVkErrorText($messages['error']);
-			$this->vkApi->chatMessage($chatId, UB_ICON_WARN . ' ' . $error);
+			$this->vkApi->chatMessage($chatId, UbIcons::WARN . ' ' . $error);
             exit('ok');
 		}
 
@@ -42,11 +42,11 @@ require_once(CLASSES_PATH . "Ub/BindManager.php");
 
 		if (isset($res['error'])) {
 			$error = UbUtil::getVkErrorText($res['error']);
-			$this->vkApi->chatMessage($chatId, UB_ICON_WARN . ' ' . $error);
+			$this->vkApi->chatMessage($chatId, UbIcons::WARN . ' ' . $error);
             exit('ok');
 		}
 
-		$this->vkApi->chatMessage($chatId, UB_ICON_SUCCESS . ' Сообщения удалены');
+		$this->vkApi->chatMessage($chatId, UbIcons::WARN . ' Сообщения удалены');
 		echo 'ok';
 	}
 }

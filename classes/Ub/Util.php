@@ -1,63 +1,62 @@
 <?php
 
-const UB_ICON_WARN = "⚠️";
-const UB_ICON_SUCCESS = "✅";
-const UB_ICON_SUCCESS_OFF = "❎";
-const UB_ICON_NOTICE = "📝";
-const UB_ICON_INFO = "🗓";
-const UB_ICON_DANGER = "📛";
-const UB_ICON_COMMENT = "💬";
-const UB_ICON_CONFIG = "⚙️";
-const UB_ICON_CATALOG = "🗂";
-const UB_ICON_STATS = "📊";
-
-class UbUtil {
-
-	public static function json(array $array): false|string
+class UbUtil
+{
+    public static function json(array $array): string|false
     {
-		return json_encode($array, JSON_UNESCAPED_UNICODE);
-	}
+        return json_encode($array, JSON_UNESCAPED_UNICODE);
+    }
 
-	public static function echoJson(array $array): void
+    public static function echoJson(array $array): void
     {
-		echo json_encode($array, JSON_UNESCAPED_UNICODE);
-	}
+        echo self::json($array);
+    }
 
-	public static function errorVkResponse(array $error): array
+    public static function errorVkResponse(array $error): array
     {
-		return self::buildErrorResponse('vk_error', $error['error_msg'], $error['error_code']);
-	}
+        return self::buildErrorResponse(
+            'vk_error',
+            $error['error_msg'] ?? 'Unknown error',
+            $error['error_code'] ?? 0
+        );
+    }
 
-	public static function echoErrorVkResponse($error): void
+    public static function echoErrorVkResponse(array $error): void
     {
-		self::echoJson(self::errorVkResponse($error));
-	}
+        self::echoJson(self::errorVkResponse($error));
+    }
 
-	public static function buildErrorResponse($type, $message, $code): array
+    public static function buildErrorResponse(string $type, string $message, int $code): array
     {
-		return ['response' => $type, 'error_message' => $message, 'error_code' => $code];
-	}
+        return [
+            'response' => $type,
+            'error_message' => $message,
+            'error_code' => $code
+        ];
+    }
 
-	public static function echoError($message, $code = -1): void
+    public static function echoError(string $message, int $code = -1): void
     {
-		echo json_encode(self::buildErrorResponse('error', $message, $code), JSON_UNESCAPED_UNICODE);
-	}
+        self::echoJson(self::buildErrorResponse('error', $message, $code));
+    }
 
-    public static function getVkErrorText($error): ?string
+    public static function getVkErrorText(array $error): ?string
     {
-        $errorCode = $error['error_code'];
-        $eMessage = $error['error_msg'];
-        $errorMessage = null;
-        switch ($errorCode) {
-            case VK_BOT_ERROR_ACCESS_DENIED :
-                if (str_contains($eMessage, 'already in'))
-                    $errorMessage = 'Пользователь уже в беседе';
-                else if (str_contains($eMessage, 'can\'t add this'))
-                    $errorMessage = 'Не могу добавить. Скорее всего пользователь не в моих друзьях.';
-                break;
-            case VK_BOT_ERROR_CANT_DELETE_FOR_ALL_USERS : $errorMessage = 'Невозможно удалить для всех пользователей.' . PHP_EOL . 'Возможно удаляющий не имеет прав администратора или удаляемые сообщения принадлежат администратору.'; break;
-            default : $errorMessage = ' Ошибка ВК (' . $errorCode . ')'; break;
-        }
-        return $errorMessage;
+        $code = $error['error_code'] ?? 0;
+        $msg  = $error['error_msg'] ?? '';
+
+        return match ($code) {
+            VK_BOT_ERROR_ACCESS_DENIED => str_contains($msg, 'already in')
+                ? 'Пользователь уже в беседе'
+                : (str_contains($msg, 'can\'t add this')
+                    ? 'Не могу добавить. Скорее всего пользователь не в моих друзьях.'
+                    : null),
+
+            VK_BOT_ERROR_CANT_DELETE_FOR_ALL_USERS =>
+                'Невозможно удалить для всех пользователей.' . PHP_EOL .
+                'Возможно удаляющий не имеет прав администратора или удаляемые сообщения принадлежат администратору.',
+
+            default => 'Ошибка ВК (' . $code . ')'
+        };
     }
 }

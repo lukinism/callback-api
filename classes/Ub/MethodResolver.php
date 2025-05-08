@@ -1,31 +1,46 @@
 <?php
 
-class UbMethodResolver {
+declare(strict_types=1);
 
-    var $map;
+class UbMethodResolver
+{
+    private const METHOD_MAP = [
+        '#confirm'         => 'Ub.Callback.Confirm',
+        'ping'             => 'Ub.Callback.Ping',
+        'banExpired'       => 'Ub.Callback.AddUser',
+        'addUser'          => 'Ub.Callback.AddUser',
+        'bindChat'         => 'Ub.Callback.Bind',
+        'subscribeSignals' => 'Ub.Callback.Bind',
+        'deleteMessages'   => 'Ub.Callback.DeleteMessages',
+        'printBookmark'    => 'Ub.Callback.PrintBookmark',
+    ];
 
-    public function __construct() {
-        $this->map = $this->buildMap();
-    }
-
-    function getMethodHandler($method) {
-        $actionName = $this->map[$method] ?? null;
-        if (!$actionName)
+    public function getMethodHandler(string $method): ?object
+    {
+        $actionName = self::METHOD_MAP[$method] ?? null;
+        if ($actionName === null) {
             return null;
+        }
 
-        return $this->getClass($actionName);
+        return $this->getClassInstance($actionName);
     }
 
-    private function buildMap() {
-        $jsonData = file_get_contents(CLASSES_PATH . 'Ub/methods.json');
-        $res = json_decode($jsonData, true);
-        return $res;
-    }
+    private function getClassInstance(string $pathClass): object
+    {
+        $classPath = str_replace('.', '/', $pathClass) . '.php';
+        $className = str_replace('.', '', $pathClass);
+        $fullPath = CLASSES_PATH . $classPath;
 
-    function getClass($pathClass) {
-        $classPath = str_replace(".", "/", $pathClass) . ".php";
-        $className = str_replace(".", "", $pathClass);
-        require_once(CLASSES_PATH . $classPath);
+        if (!file_exists($fullPath)) {
+            throw new RuntimeException("Class file not found: $fullPath");
+        }
+
+        require_once $fullPath;
+
+        if (!class_exists($className)) {
+            throw new RuntimeException("Class not found: $className");
+        }
+
         return new $className();
     }
 }

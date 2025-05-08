@@ -15,7 +15,7 @@ require_once(CLASSES_PATH . "Ub/BindManager.php");
 		$message = $vk->messagesGetByConversationMessageId($peerId, [$object['conversation_message_id']]);
 		if (isset($message['error'])) {
 			$e = $message['error'];
-			$res = $vk->messagesSend($peerId, UB_ICON_WARN . ' Ошибка ВК: ' . $e['error_msg'] . ' (' . $e['error_code'] . ')');
+			$res = $vk->messagesSend($peerId, UbIcons::WARN . ' Ошибка ВК: ' . $e['error_msg'] . ' (' . $e['error_code'] . ')');
 			return;
 		}
 		$messages = $message['response']['items'];
@@ -26,7 +26,7 @@ require_once(CLASSES_PATH . "Ub/BindManager.php");
 			if (isset($message['error'])) { // ошибка при отправлении в ВК
 				$e = $message['error'];
 
-				$msg = UB_ICON_WARN . " Закладка недоступна. Удаляю.";
+				$msg = UbIcons::WARN . " Закладка недоступна. Удаляю.";
                 $msg .= match ($e['error_code']) {
                     100 => "\n Скорее всего сменился юзербот (100)",
                     default => "\nОшибка ВК: " . $e['error_msg'] . ' (' . $e['error_code'] . ')',

@@ -50,7 +50,7 @@ class UbCallbackBind implements UbCallbackAction {
             ];
 
             $this->bindManager->saveOrUpdate($t);
-            $this->vkApi->chatMessage($userChatId, UB_ICON_SUCCESS . ' Беседа распознана');
+            $this->vkApi->chatMessage($userChatId, UbIcons::SUCCESS . ' Беседа распознана');
             echo 'ok';
         } else {
             UbUtil::echoError('no chat id', UB_ERROR_CANT_BIND_CHAT);

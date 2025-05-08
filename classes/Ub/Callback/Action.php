@@ -1,5 +1,5 @@
 <?php
 
 interface UbCallbackAction {
-	function execute($userId, $object, $userData);
+	function execute(int $userId, array $object, array $userData);
 }
